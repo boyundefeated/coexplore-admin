@@ -1,20 +1,25 @@
 package com.coexplore.admin.controller;
 
-
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class MainController {
-	
+
     @RequestMapping("/")
-    public String home(Model model) {
-        return "index";
+    ModelAndView home(ModelAndView modelAndView) {
+
+        modelAndView.setViewName("index");
+        modelAndView.getModel().put("name", "John");
+
+        return modelAndView;
     }
-    
+
     @RequestMapping("/login")
-    public String login(Model model) {
-        return "login";
+    ModelAndView login(ModelAndView modelAndView) {
+
+        modelAndView.setViewName("login");
+        return modelAndView;
     }
 }
