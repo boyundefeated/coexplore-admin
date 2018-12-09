@@ -34,7 +34,7 @@
     <div class="container body">
       <div class="main_container">
 
-		 <jsp:include page="../partial/header.jsp"/>
+		 <jsp:include page="../partials/header.jsp"/>
 		
         <!-- page content -->
         <div class="right_col" role="main">
@@ -730,7 +730,7 @@
         </div>
         <!-- /page content -->
 
-       	<jsp:include page="../partial/footer.jsp"/>
+       	<jsp:include page="../partials/footer.jsp"/>
 
       </div>
     </div>
