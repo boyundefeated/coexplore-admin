@@ -3,7 +3,7 @@ var CONSTANTS = {
 	PREFIX_API_PATH : "http://localhost:8081/api"
 }
 var ACCESS_TOKEN = 'access_token';
-var USER_NAME = 'user_name';
+var AUTHORITIES = 'authorities';
 var EMAIL = 'email';
 var USER_ID = 'user_id';
 var ROLE = 'role';
@@ -77,9 +77,21 @@ function getAuthHeader() {
 		Authorization : 'Bearer ' + token, // If your header name has spaces or
 											// any other char not appropriate
 	}
+	if(!isAdmin()){
+		return  "";
+	}
 	return header;
 }
-
+function isAdmin(){
+	var authorities = readCookie(AUTHORITIES);
+	if(!authorities){
+		return false;
+	}
+	if(authorities.includes("ROLE_ADMIN")){
+		return true;
+	}
+	return false;
+}
 function getToken() {
 	var token = readCookie(ACCESS_TOKEN);
 	return token;
@@ -100,6 +112,8 @@ function isSignedIn() {
 function setUserInfo(userInfo) {
 	var expiredIn = userInfo.expiredIn;
 	createCookie(ACCESS_TOKEN, userInfo.accessToken, expiredIn);
+	createCookie(AUTHORITIES, userInfo.authorities, expiredIn);
+
 //	createCookie(USER_NAME, userInfo.fullname, COOKIE_TTL);
 //	createCookie(USER_ID, userInfo.userId, COOKIE_TTL);
 //	createCookie(EMAIL, userInfo.email, COOKIE_TTL);
@@ -116,8 +130,9 @@ $(document).ready(function() {
 	}
 
 	// click logout
-	$("#logout").on('click', function(e) {
+	$(".logout").on('click', function(e) {
 		removeCookie();
+		$(location).attr('href', '/login');
 		return true;
 	});
 });
@@ -129,7 +144,9 @@ function formatCurrency(price) {
 		currency : 'VND'
 	});
 }
-
+function makeSuccessNotification(){
+//	makeSuccessNotification("");
+}
 function makeSuccessNotification(text){
 	new PNotify({
         title: 'Success!',
@@ -147,3 +164,19 @@ function makeErrorNotification(text){
     });
 }
 PNotify.prototype.options.delay = 2000; //miliseconds
+
+
+function checkCommonError(err){
+	let httpStatus = err.status;
+	if(httpStatus == 401 || httpStatus == 403){
+		makeErrorNotification("Access is denied");
+		removeCookie();
+		$(location).attr('href', '/login');
+	} else if(httpStatus == 400){
+		makeErrorNotification("There was an error");
+	} else if(httpStatus == 500){
+		makeErrorNotification("Internal server error");		
+	}else{
+		makeErrorNotification("Unknown error");	
+	}
+}

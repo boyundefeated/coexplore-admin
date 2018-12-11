@@ -1,3 +1,17 @@
+const GOOGLE_CLIENT_ID = '251059155311-0dmuf85kldje8u0s6lj24j8cvdvub1v9.apps.googleusercontent.com';
+const FACEBOOK_APP_ID = '134306623917784';
+function loginSuccess(response){
+	if(response.value && response.value.authorities){
+		if(response.value.authorities.includes("ROLE_ADMIN")){
+			setUserInfo(response.value);
+			window.location = '/';
+		}else{
+			makeErrorNotification("Access is denied");
+		}
+	}else{
+		makeErrorNotification("Access is denied");
+	}
+}
 $(function() {
 	$("#loginForm").on('submit', function(e) {
 		// e.preventDefault();
@@ -12,12 +26,10 @@ $(function() {
 			contentType : "application/json",
 			dataType : 'json',
 			success : function(response) {
-				alert("SUCCESS");
-				setUserInfo(response.value);
-				window.location = '/';
+				loginSuccess(response);
 			},
-			error : function() {
-				alert('Error');
+			error : function(err) {
+				checkCommonError(err);
 			}
 		});
 		return false;
@@ -39,20 +51,20 @@ $(function() {
 			contentType : "application/json",
 			dataType : 'json',
 			success : function(response) {
-				alert("SUCCESS");
-				// window.location = '/';
+				makeSuccessNotification();
+				window.location = '/login';
 			},
-			error : function() {
-				alert('Error');
+			error : function(err) {
+				checkCommonError(err);
 			}
 		});
 		return false;
 	});
 
 	// redirect if user logged in
-	/*
-	 * if (isSignedIn()) { $(location).attr('href', '/'); }
-	 */
+	if (isSignedIn()) {
+		$(location).attr('href', '/');
+	}
 
 	// validation
 	// $("#registerForm").validate({
@@ -141,69 +153,98 @@ $(function() {
 });
 
 loginWithFacebook = function() {
-	FB.login(function(response) {
-		if (response.authResponse) {
-			console.log(response);
-			console.log(response.authResponse);
-			$.ajax({
-				type : 'GET',
-				url : 'https://graph.facebook.com/me?fields=id,name,picture,first_name,last_name,email&access_token=' + response.authResponse.accessToken ,
-				success : function(data) {
-					console.log(data);
-//					{
-//						"id": "1183605018437037",
-//						"name": "Nguyễn Hải Duy",
-//						"picture":{
-//						"data":{"height": 50, "is_silhouette": false, "url": "https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=1183605018437037&height=50&width=50&ext=1547050527&hash=AeRhR8rnWtM9dSV0",…}
-//						},
-//						"first_name": "Duy",
-//						"last_name": "Nguyễn Hải"
-//						}
-				},
-				error : function(jqXHR, status, err) {
-					console.log(err);
-					// makeErrorToast("Can not Login with Facebook");
-				},
-				dataType : 'json'
+	FB
+			.login(function(response) {
+				if (response.authResponse) {
+					console.log(response);
+					console.log(response.authResponse);
+					$
+							.ajax({
+								type : 'GET',
+								url : 'https://graph.facebook.com/me?fields=id,name,picture,first_name,last_name,email,link&access_token='
+										+ response.authResponse.accessToken,
+								success : function(data) {
+									console.log(data);
+									requestLoginWithSocial(data, "FACEBOOK");
+									// {
+									// "id": "1183605018437037",
+									// "name": "Nguyễn Hải Duy",
+									// "picture":{
+									// "data":{"height": 50, "is_silhouette":
+									// false, "url":
+									// "https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=1183605018437037&height=50&width=50&ext=1547050527&hash=AeRhR8rnWtM9dSV0",…}
+									// },
+									// "first_name": "Duy",
+									// "last_name": "Nguyễn Hải"
+									// }
+								},
+								error : function(err) {
+									checkCommonError(err);
+								},
+								dataType : 'json'
+							});
+
+				} else {
+					// makeErrorToast('User cancelled login or did not fully
+					// authorize.');
+				}
 			});
-//			$.ajax({
-//				type : 'POST',
-//				url : '/api/authentication/facebook',
-//				data : JSON.stringify(response.authResponse), // or
-//																// JSON.stringify
-//																// ({name:
-//																// 'jonas'}),
-//				success : function(data) {
-//					createCookie('access_token', data.token, COOKIE_TTL);
-//					$(location).attr('href', '/gui/home');
-//				},
-//				error : function(jqXHR, status, err) {
-//					// makeErrorToast("Can not Login with Facebook");
-//				},
-//				contentType : "application/json",
-//				dataType : 'json'
-//			});
-			// Now you can redirect the user or do an AJAX request to
-			// a PHP script that grabs the signed request from the cookie.
-		} else {
-			// makeErrorToast('User cancelled login or did not fully
-			// authorize.');
-		}
-	});
 	return false;
 };
+
+function requestLoginWithSocial(profile, type) {
+	var login, email, firstName, lastName, imageUrl, profileUrl;
+	if (type == "FACEBOOK") {
+		login = profile.id;
+		email = profile.email;
+		firstName = profile.first_name;
+		lastName = profile.last_name;
+		if (profile.picture && profile.picture.data) {
+			imageUrl = profile.picture.data.url;
+		}
+		profileUrl = profile.link;
+	} else if (type == "GOOGLE") {
+		login = profile.Eea;
+		email = profile.U3;
+		firstName = profile.getGivenName();
+		lastName = profile.getFamilyName();
+		imageUrl = profile.Paa;
+		profileUrl = profile.profileUrl;
+	}
+	var reqData = {
+		login : login,
+		email : email,
+		firstName : firstName,
+		lastName : lastName,
+		imageUrl : imageUrl,
+		type : type,
+		profileUrl : profileUrl
+	}
+
+	$.ajax({
+		type : "POST",
+		url : CONSTANTS.PREFIX_API_PATH + "/authentication/social",
+		data : JSON.stringify(reqData),
+		contentType : "application/json",
+		dataType : 'json',
+		success : function(response) {
+			loginSuccess(response);
+		},
+		error : function(err) {
+			checkCommonError(err);
+		}
+	});
+}
+
 window.fbAsyncInit = function() {
 	FB.init({
-		appId : '134306623917784',
+		appId : FACEBOOK_APP_ID,
 		cookie : true,
 		xfbml : true,
 		version : 'v2.11'
 	});
-
 	FB.AppEvents.logPageView();
-
 };
-
 (function(d, s, id) {
 	var js, fjs = d.getElementsByTagName(s)[0];
 	if (d.getElementById(id)) {
@@ -218,66 +259,65 @@ window.fbAsyncInit = function() {
 function onSignInGoogle(googleUser) {
 	// Useful data for your client-side scripts:
 	var profile = googleUser.w3;
-	 console.log("ID: " + profile.Eea); // Don't send this directly to your server!
-	 console.log('Full Name: ' + profile.ig);
-	 console.log('Given Name: ' + profile.getGivenName());
-	 console.log('Family Name: ' + profile.getFamilyName());
-	 console.log("Image URL: " + profile.Paa);
-	 console.log("Email: " + profile.U3);
-	reqData = {
-		id : profile.Eea,
-		fullname : profile.ig,
-		email_address : profile.U3,
-	}
-	$.ajax({
-		type : 'POST',
-		url : '/api/authentication/google',
-		data : JSON.stringify(reqData), // or JSON.stringify ({name: 'jonas'}),
-		success : function(data) {
-			createCookie('access_token', data.token, COOKIE_TTL);
-			$(location).attr('href', '/gui/home/');
-		},
-		error : function(jqXHR, status, err) {
-			// makeErrorToast("Can not Login with Facebook");
-		},
-		contentType : "application/json",
-		dataType : 'json'
-	})
-};
+	console.log(profile);
+	// console.log("ID: " + profile.Eea); // Don't send this directly to your
+	// // server!
+	// console.log('Full Name: ' + profile.ig);
+	// console.log('Given Name: ' + profile.getGivenName());
+	// console.log('Family Name: ' + profile.getFamilyName());
+	// console.log("Image URL: " + profile.Paa);
+	// console.log("Email: " + profile.U3);
 
+	// This sample assumes a client object has been created.
+	// To learn more about creating a client, check out the starter:
+	// https://developers.google.com/+/quickstart/javascript
+	var request = gapi.client.plus.people.get({
+		'userId' : 'me'
+	});
+
+	request.execute(function(resp) {
+		console.log(resp);
+//		console.log('ID: ' + resp.id);
+//		console.log('Display Name: ' + resp.displayName);
+//		console.log('Image URL: ' + resp.image.url);
+//		console.log('Profile URL: ' + resp.url);
+		profile.profileUrl = resp.url;
+		requestLoginWithSocial(profile, "GOOGLE");
+	});
+};
 /**
  * Initializes Signin v2 and sets up listeners.
  */
 var initSigninV2 = function() {
-	auth2 = gapi.auth2
-			.init({
-				client_id : '251059155311-0dmuf85kldje8u0s6lj24j8cvdvub1v9.apps.googleusercontent.com',
-				scope : 'profile email'
-			});
+	gapi.client.load('plus', 'v1').then(function() {
+
+	});
+	auth2 = gapi.auth2.init({
+		client_id : GOOGLE_CLIENT_ID,
+		scope : 'profile email'
+	});
+
 	// Listen for sign-in state changes.
 	auth2.isSignedIn.listen(signinChanged);
-
 	// Listen for changes to current user.
 	auth2.currentUser.listen(userChanged);
-
 };
 logInWithGoogle = function() {
 	if (auth2) {
 		auth2.signIn();
 	}
 }
-
 /**
  * Listener method for sign-out live value.
  * 
  * @param {boolean}
  *            val the updated signed out state.
  */
+
 var googleLoginState = false;
 var signinChanged = function(val) {
 	googleLoginState = val;
 };
-
 /**
  * Listener method for when the user changes.
  * 
@@ -290,7 +330,6 @@ var userChanged = function(user) {
 		onSignInGoogle(user);
 	}
 };
-
 // <a href="#" onclick="signOut();">Sign out</a>
 function signOut() {
 	var auth2 = gapi.auth2.getAuthInstance();
@@ -298,12 +337,7 @@ function signOut() {
 		console.log('User signed out.');
 	});
 }
-
 // Shorthand for $( document ).ready()
-//window.onLoadCallback = function() {
-//	gapi.load('auth2', initSigninV2);
-//}
 $(function() {
 	gapi.load('auth2', initSigninV2);
-
 });

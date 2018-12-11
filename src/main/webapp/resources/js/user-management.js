@@ -120,11 +120,11 @@ $(function() {
 										url : CONSTANTS.PREFIX_API_PATH
 												+ '/user/' + data.login,
 										success : function() {
-											$.alert("Thành công");
+											makeSuccessNotification();
 											row.remove().draw(false);
 										},
-										error : function(jqXHR, status, err) {
-											$.alert("Xóa thất bại");
+										error : function(err) {
+											checkCommonError(err);
 										},
 										contentType : "application/json",
 									});
@@ -188,13 +188,13 @@ $(function() {
 					contentType : "application/json",
 					dataType : 'json',
 					success : function(response) {
-						alert("Thành công");
+						makeSuccessNotification();
 						$('#myModal').modal('hide');
 						table.ajax.reload(null, false); // user paging is not
 						// reset on reload
 					},
-					error : function() {
-						alert('Lỗi');
+					error : function(err) {
+						checkCommonError(err);
 					}
 				});
 				return false;
@@ -228,13 +228,13 @@ $(function() {
 					contentType : "application/json",
 					dataType : 'json',
 					success : function(response) {
-						alert("Thành công");
+						makeSuccessNotification();
 						$('#myModal').modal('hide');
 						table.ajax.reload(null, false); // user paging is not
 						// reset on reload
 					},
-					error : function() {
-						alert('Lỗi');
+					error : function(err) {
+						checkCommonError(err);
 					}
 				});
 				return false;

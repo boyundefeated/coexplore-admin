@@ -20,83 +20,27 @@
 <!-- Animate.css -->
 <link href="/resources/vendors/animate.css/animate.min.css"
 	rel="stylesheet">
+<!-- for Login button  -->
+<link href="/resources/css/bootstrap-social.css" rel="stylesheet">
+
+<!-- PNotify -->
+<link href="/resources/vendors/pnotify/dist/pnotify.css"
+	rel="stylesheet">
+<link href="/resources/vendors/pnotify/dist/pnotify.buttons.css"
+	rel="stylesheet">
 
 <!-- Custom Theme Style -->
 <link href="/resources/build/css/custom.min.css" rel="stylesheet">
-<style>
-/* Shared */
-.loginBtn {
-  box-sizing: border-box;
-  position: relative;
-  /* width: 13em;  - apply for fixed size */
-  margin: 0.2em;
-  padding: 0 15px 0 46px;
-  border: none;
-  text-align: left;
-  line-height: 34px;
-  white-space: nowrap;
-  border-radius: 0.2em;
-  font-size: 16px;
-  color: #FFF;
-}
-.loginBtn:before {
-  content: "";
-  box-sizing: border-box;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 34px;
-  height: 100%;
-}
-.loginBtn:focus {
-  outline: none;
-}
-.loginBtn:active {
-  box-shadow: inset 0 0 0 32px rgba(0,0,0,0.1);
-}
-
-
-/* Facebook */
-.loginBtn--facebook {
-  background-color: #4C69BA;
-  background-image: linear-gradient(#4C69BA, #3B55A0);
-  /*font-family: "Helvetica neue", Helvetica Neue, Helvetica, Arial, sans-serif;*/
-  text-shadow: 0 -1px 0 #354C8C;
-}
-.loginBtn--facebook:before {
-  border-right: #364e92 1px solid;
-  background: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/14082/icon_facebook.png') 6px 6px no-repeat;
-}
-.loginBtn--facebook:hover,
-.loginBtn--facebook:focus {
-  background-color: #5B7BD5;
-  background-image: linear-gradient(#5B7BD5, #4864B1);
-}
-
-
-/* Google */
-.loginBtn--google {
-  /*font-family: "Roboto", Roboto, arial, sans-serif;*/
-  background: #DD4B39;
-}
-.loginBtn--google:before {
-  border-right: #BB3F30 1px solid;
-  background: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/14082/icon_google.png') 6px 6px no-repeat;
-}
-.loginBtn--google:hover,
-.loginBtn--google:focus {
-  background: #E74B37;
-}
-</style>
 </head>
 
 <body class="login">
-
 	<div id="fb-root"></div>
 	<!--<meta name="google-signin-scope" content="profile email">-->
 	<!--<meta name="google-signin-client_id"-->
 	<!--content="251059155311-0dmuf85kldje8u0s6lj24j8cvdvub1v9.apps.googleusercontent.com">-->
 	<script src="https://apis.google.com/js/platform.js"></script>
+	<script src = "https://apis.google.com/js/client:plusone.js"></script>
+	
 	<div>
 		<a class="hiddenanchor" id="signup"></a> <a class="hiddenanchor"
 			id="signin"></a>
@@ -120,7 +64,12 @@
 
 							<a class="reset_pass" href="#">Lost your password?</a>
 						</div>
-
+						<br> <a class="btn btn-block btn-social btn-facebook"
+							href="#" onclick="loginWithFacebook()"> <span
+							class="fa fa-facebook"></span>Sign in with Facebook
+						</a> <a class="btn btn-block btn-social btn-google" href="#"
+							onclick="logInWithGoogle()"><span class="fa fa-google"></span>Sign in
+							with Google</a>
 						<div class="clearfix"></div>
 
 						<div class="separator">
@@ -128,11 +77,7 @@
 								New to site? <a href="#signup" class="to_register"> Create
 									Account </a>
 							</p>
-							<a class="loginBtn loginBtn--facebook" href="#" onclick="loginWithFacebook()">Login with
-								Facebook</a>
 
-							<a class="loginBtn loginBtn--google"  href="#" onclick="logInWithGoogle()">Login with
-								Google</a>
 							<div class="clearfix"></div>
 							<br />
 
@@ -199,6 +144,10 @@
 		</div>
 	</div>
 	<script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+
+	<!-- PNotify -->
+	<script src="/resources/vendors/pnotify/dist/pnotify.js"></script>
+	<script src="/resources/vendors/pnotify/dist/pnotify.buttons.js"></script>
 	<!-- 	<script
 		src="//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js"></script> -->
 	<script src="/resources/js/common.js"></script>

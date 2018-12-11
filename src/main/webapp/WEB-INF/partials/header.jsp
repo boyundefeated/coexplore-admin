@@ -63,8 +63,8 @@
 				<span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
 			</a> <a data-toggle="tooltip" data-placement="top" title="Lock"> <span
 				class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-			</a> <a data-toggle="tooltip" data-placement="top" title="Logout"
-				href="login.html"> <span class="glyphicon glyphicon-off"
+			</a> <a data-toggle="tooltip" data-placement="top" title="Logout" class="logout"
+				href="#"> <span class="glyphicon glyphicon-off"
 				aria-hidden="true"></span>
 			</a>
 		</div>
@@ -92,7 +92,7 @@
 								class="badge bg-red pull-right">50%</span> <span>Settings</span>
 						</a></li>
 						<li><a href="javascript:;">Help</a></li>
-						<li><a href="login.html"><i
+						<li><a href="#" class="logout"><i
 								class="fa fa-sign-out pull-right"></i> Log Out</a></li>
 					</ul></li>
 
